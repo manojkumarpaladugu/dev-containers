@@ -10,7 +10,7 @@ SUPPORTED_EDITORS=("code" "cursor")
 EDITOR="code"
 # HOST: SSH host name configured in ~/.ssh/config
 HOST="Fusion"
-DEV_CONTAINER_DIR="/opt/workspace/vscode-devcontainer/Zephyr"
+DEV_CONTAINER_DIR="/opt/workspace/dev-containers/zephyr"
 CONTAINER_WORK_DIR="/opt/workspace"
 
 # Validate configuration
