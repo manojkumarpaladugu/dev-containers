@@ -19,7 +19,6 @@
                 "marus25.cortex-debug",
                 "mhutchie.git-graph",
                 "eamodio.gitlens",
-                "twxs.cmake",
                 "ms-vscode.cmake-tools",
                 "ms-vscode.cpptools",
                 "ms-vscode.cpptools-extension-pack",
@@ -28,7 +27,10 @@
             ]
         }
     },
-
+    "containerEnv": {
+        "DISPLAY": null,
+        "WAYLAND_DISPLAY": null
+    },
     "onCreateCommand": "bash /.devcontainer/on_create_command.sh",
     "postStartCommand": "bash /.devcontainer/post_start_command.sh"
 }
