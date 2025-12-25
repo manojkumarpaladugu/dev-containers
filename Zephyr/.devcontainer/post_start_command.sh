@@ -4,6 +4,8 @@
 
 set -euo pipefail
 
-# Add your commands here
+# Copy host mounted SSH configuration to the container's home directory
+cp -r /opt/.host/.ssh $HOME/
+cp /opt/.host/.gitconfig $HOME/
 
 exec "$@"
