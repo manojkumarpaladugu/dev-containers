@@ -1,9 +1,7 @@
 {
     "SUPPORTED_EDITORS": ["code", "cursor"],
-    "DEFAULT_EDITOR": "code",
     "DEFAULT_HOST": "Fusion",
     "DEFAULT_DEV_CONTAINER": "/opt/workspace/dev-containers/zephyr",
     "DEFAULT_WORKSPACE": "/opt/workspace",
-    "DEFAULT_SSH_PORT": 22,
-    "DEFAULT_SSH_KEY": ""
+    "DEFAULT_EDITOR": "code"
 }

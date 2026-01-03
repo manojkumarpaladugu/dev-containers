@@ -1,70 +1,101 @@
-# Dev Containers Setup
+# Remote Editor Launcher
 
-This repository contains helper scripts to open a development workspace in an editor (VS Code or Cursor) and connect to local or remote development containers and hosts.
+A Python utility to streamline launching editor (VS Code or Cursor) into remote environments, including SSH hosts and Docker dev containers (both local and remote). It automates the URI encoding required for vscode-remote protocols and verifies connections before attempting to open the editor.
 
-**Prerequisites**
-- **Docker**: for `local-container` and remote containers. Install Docker and follow post-install steps for your OS.
-- **SSH access**: for `remote-host` and `remote-container` modes (passwordless/agent-based SSH is recommended).
-- **Editor**: one of the supported editors (see configuration).
 
-**Where to look**
-- The launcher script is `scripts/launch.py`.
-- Defaults are configured in `scripts/launch.json`.
+## Features
 
-**Usage**
-The launcher is a Python script that provides three connection modes: `remote-host`, `remote-container`, and `local-container`.
+- **Three Connection Modes**:
 
-Run the launcher with the mode as the first positional argument. Use `--dry-run` to print the computed URI and command without launching the editor, and `--verbose` for more output.
+  - `remote-host`: Direct SSH connection to a remote host.
 
-Common flags (available to all modes):
-- `--editor`: Editor executable to run (default from `scripts/launch.json`).
-- `--ssh-port`: SSH port (default from `scripts/launch.json`).
-- `--ssh-key`: Path to the SSH private key to use for SSH connections.
-- `--dry-run`: Print the commands / URI without launching.
-- `--verbose`: Print extra information.
+  - `remote-container`: Connect to a Docker container running on a remote SSH host.
 
-Modes and mode-specific flags:
-- `remote-host`:
-	- `--host`: Remote host to SSH to (default from config).
-	- `--workspace`: Workspace path to open on the remote host (default from config).
-- `remote-container`:
-	- `--host`: Remote host to SSH to.
-	- `--dev-container`: Path to the dev container configuration on the remote host.
-	- `--workspace`: Remote workspace path to open.
-- `local-container`:
-	- `--dev-container`: Path to the local dev container configuration (will be hex-encoded into the URI).
-	- `--workspace`: Local workspace path to open.
+  - `local-container`: Connect to a Docker container on your local machine.
 
-Notes about behavior:
-- `remote-host` and `remote-container` test the SSH connection by running a simple `true` remote command first; ensure SSH connectivity is working.
-- `local-container` checks Docker availability by running `docker info` before proceeding.
-- When specifying a dev container path, the script hex-encodes the path and embeds it in the `vscode-remote` URI (this matches VS Code's `dev-container` URI format used by the script).
+- **Flexible Configuration**: Supports configurations through mix of command line options and `defaults.json` file.
 
-Examples
-```bash
-# Remote host (dry-run)
-python scripts/launch.py remote-host --host example.com --workspace /home/dev --editor code --dry-run
+- **Multi-Editor Support**: Works with VS Code and Cursor.
 
-# Remote container, verbose
-python scripts/launch.py remote-container --host example.com --dev-container /opt/workspace/dev-containers/zephyr --workspace /home/dev --editor code --verbose
 
-# Local container
-python scripts/launch.py local-container --dev-container /opt/workspace/dev-containers/zephyr --workspace /opt/workspace --editor code
+## Requirements
+
+- Python 3.6+
+
+- VS Code or Cursor (with Remote Development extension pack).
+
+- SSH Client (for `remote-host` and `remote-container`).
+
+- Docker (for `local-container`).
+
+
+## Installation
+
+Save the script (e.g., launcher.py) to your local machine.
+
+(Optional) Create a `default.json` in the same directory to customize your default paths and hosts.
+
+```json
+{
+    "SUPPORTED_EDITORS": ["code", "cursor"],
+    "DEFAULT_HOST": "my-dev-host",
+    "DEFAULT_DEV_CONTAINER": "/path/to/devcontainer",
+    "DEFAULT_WORKSPACE": "/path/to/workspace",
+    "DEFAULT_EDITOR": "code",
+}
 ```
 
-Configuration (`scripts/launch.json`)
-The script reads `scripts/launch.json` for default values. Typical keys include:
-- `SUPPORTED_EDITORS`: array of editor executable names (e.g. `["code", "cursor"]`).
-- `DEFAULT_EDITOR`: default editor executable (e.g. `"code"`).
-- `DEFAULT_HOST`: default SSH host to use for remote modes.
-- `DEFAULT_DEV_CONTAINER`: default path to local/remote dev container config.
-- `DEFAULT_WORKSPACE`: default workspace path to open in the editor.
-- `DEFAULT_SSH_PORT`: default SSH port (usually `22`).
-- `DEFAULT_SSH_KEY`: default SSH private key path (empty by default).
 
-Remote helper
-- Use `RemoteVSCode/prepare_remote_setup.py` to help prepare remote hosts (setup keys, git, etc.). Example:
+## Usage
+
+### Global Options
+
+These flags can be applied to any mode:
+
+- `--workspace`: Specify the directory path to open within the target environment.
+
+- `--editor`: Choose between `code` or `cursor`.
+
+  Note: Windows users may need to suffix with .cmd (`code.cmd` and `cursor.cmd`)
+
+- `--dry-run`: Display the commands/URIs without launching the editor.
+
+- `--verbose`: Show detailed logs and SSH debug output.
+
+The script uses subparsers for each mode. You can view help for any mode using the --help flag.
+
+### 1. Remote Host (SSH)
+
+Connect directly to a workspace on a remote host.
 
 ```bash
-python RemoteVSCode/prepare_remote_setup.py --git_user username --remote_user username --remote_host hostname-or-ip
+python launcher.py remote-host --host my-dev-host --workspace /path/to/workspace --editor code --verbose
 ```
+
+
+### 2. Remote Container (SSH)
+
+Connect to a dev container on a remote host.
+
+```bash
+python launcher.py remote-container --host my-dev-host --dev-container /path/to/devcontainer --workspace /path/to/workspace --editor code --verbose
+```
+
+
+### 3. Local Container
+
+Connect to a dev container on local host.
+
+```bash
+python launcher.py local-container --dev-container /path/to/devcontainer --workspace /path/to/workspace --editor code --verbose
+```
+
+
+## Troubleshooting
+- **Editor not found**: If editor can't be found, use full path of the editor.
+
+- **SSH Failures**: Ensure the remote host is added in SSH config file.
+
+- **Docker Failures**: For `local-container` mode, ensure the Docker daemon is running.
+
+- **URI Issues**: The script hex-encodes the dev-container path as required by the `vscode-remote://` protocol. If the editor opens but cannot find the container, verify the absolute path to your `.devcontainer` directory.
