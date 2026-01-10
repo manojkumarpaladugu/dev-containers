@@ -168,7 +168,6 @@ def main():
         hex_path = hex_encode(args.dev_container)
         uri = f"vscode-remote://dev-container+{hex_path}@ssh-remote+{args.host}{args.workspace}"
     elif args.mode == 'local-container':
-        run(cmd=["docker", "info"], verbose=args.verbose, dry_run=args.dry_run)
         hex_path = hex_encode(args.dev_container)
         uri = f"vscode-remote://dev-container+{hex_path}@{args.workspace}"
 
